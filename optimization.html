@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Optimization Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #0078D7;
+        }
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        p, ul {
+            line-height: 1.6;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .equation {
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Mathematical Explanation of the Risk Distribution Optimization</h1>
+
+        <h2>Ex Ante Active Risk</h2>
+        <p>
+            The <strong>Ex Ante Active Risk</strong> measures the <strong>expected</strong> volatility of the portfolio's deviation from the benchmark. It is defined as:
+        </p>
+        <div class="equation">
+            \[
+            \text{Ex Ante Tracking Error} = \sqrt{(w - w_b)^T \Sigma (w - w_b)}
+            \]
+        </div>
+        <p>Where:</p>
+        <ul>
+            <li><strong>\( w \)</strong>: Portfolio weights</li>
+            <li><strong>\( w_b \)</strong>: Benchmark weights</li>
+            <li><strong>\( \Sigma \)</strong>: Covariance matrix of sector returns</li>
+            <li><strong>\( (w - w_b) \)</strong>: Active weights (portfolio weights minus benchmark weights)</li>
+        </ul>
+
+        <h2>Marginal Risk Contribution</h2>
+        <p>
+            The <strong>Marginal Risk Contribution</strong> represents the sensitivity of the portfolio's active risk to a small change in the portfolio weight \( w_i \). It is calculated as:
+        </p>
+        <div class="equation">
+            \[
+            \text{Marginal Risk Contribution}_i = \frac{\partial \text{Ex Ante Active Risk}}{\partial w_i} = \frac{\Sigma w}{\text{Ex Ante Tracking Error}}
+            \]
+        </div>
+
+        <h2>Ex Ante Active Risk Contribution</h2>
+        <p>
+            The <strong>Ex Ante Active Risk Contribution</strong> quantifies the risk contributed by each sector to the total Ex Ante active risk. It is calculated as:
+        </p>
+        <div class="equation">
+            \[
+            \text{Ex Ante Active Risk Contribution}_i = \frac{\partial \text{Ex Ante Active Risk}}{\partial w_i} \cdot w_i
+            \]
+        </div>
+
+        <h2>Objective Function: Minimize Standard Deviation of Ex Ante Active Risk Contributions</h2>
+        <p>
+            The optimization minimizes the standard deviation of the Ex Ante active risk contributions:
+        </p>
+        <div class="equation">
+            \[
+            \text{Objective} = \text{MIN std}(\text{Ex Ante Active Risk Contributions})
+            \]
+        </div>
+
+        <h2>Constraints</h2>
+        <ul>
+            <li>
+                <strong>Active Share Constraint:</strong><br>
+                The portfolio must deviate from the benchmark by a specified active share target \( k \):
+                <div class="equation">
+                    \[
+                    \text{Active Share} = \frac{1}{2} \sum_{i=1}^N |w_i - w_{b,i}| = k
+                    \]
+                </div>
+            </li>
+            <li>
+                <strong>No Short Constraint:</strong><br>
+                Portfolio weights cannot be negative:
+                <div class="equation">
+                    \[
+                    w_i \geq 0, \quad \forall i
+                    \]
+                </div>
+            </li>
+            <li>
+                <strong>Weight Sum Constraint:</strong><br>
+                The total sum of weights equals the active share target \( k \):
+                <div class="equation">
+                    \[
+                    \sum_{i=1}^N w_i = k
+                    \]
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <h2>How SLSQP Optimization Works</h2>
+        <p>
+            The Sequential Least Squares Quadratic Programming (SLSQP) algorithm solves the constrained optimization problem iteratively. 
+            The key steps include:
+        </p>
+        <ul>
+            <li>
+                <strong>Gradient Calculation:</strong> The gradient of the objective function with respect to the portfolio weights \( w \) 
+                is computed at each iteration.
+            </li>
+            <li>
+                <strong>Constraint Satisfaction:</strong> The algorithm adjusts the portfolio weights to satisfy all constraints, 
+                including the active share and no short constraints.
+            </li>
+            <li>
+                <strong>Step Direction:</strong> Based on the gradient, SLSQP determines the optimal step direction that minimizes 
+                the objective function while respecting the constraints.
+            </li>
+            <li>
+                <strong>Convergence:</strong> The algorithm iterates until the change in the objective function or weights is sufficiently small.
+            </li>
+        </ul>
+    </div>
+    </div>
+
+    <div class="content">
+        <h2>Example of SLSQP Optimization</h2>
+        <p>Below examples are the actual optimizations as of <strong>November 29th 2024</strong></p>
+        <p>The following shows an optimization with <strong>no-short constraint</strong>:</p>
+        <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>                <div id="eb69664f-11d3-4426-9b5a-5a7b50867ed4" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("eb69664f-11d3-4426-9b5a-5a7b50867ed4")) {                    Plotly.newPlot(                        "eb69664f-11d3-4426-9b5a-5a7b50867ed4",                        [{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[-4.875833333333333,0.4089666666666672,22.808666666666667,-5.837633333333333,2.413266666666668,7.457766666666667],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[-4.875833333333333,0.4089666666666672,22.808666666666667,-5.837633333333333,2.413266666666668,7.457766666666667],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[20.659911026101412,17.144594771825936,18.155967785552708,13.603164341731267,11.844229521553478,18.592132553235203],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[20.659911026101412,17.144594771825936,18.155967785552708,13.603164341731267,11.844229521553478,18.592132553235203],"type":"bar"}],                        {"barmode":"group","sliders":[{"steps":[{"args":[["Iteration 1"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 1","method":"animate"},{"args":[["Iteration 2"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 2","method":"animate"},{"args":[["Iteration 3"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 3","method":"animate"},{"args":[["Iteration 4"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 4","method":"animate"},{"args":[["Iteration 5"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 5","method":"animate"}]}],"title":{"text":"Optimization Process: Active Weights and Ex Ante Risk Contribution"},"yaxis":{"range":[-50,50]},"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
+                            Plotly.addFrames('eb69664f-11d3-4426-9b5a-5a7b50867ed4', [{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[-4.875833333333333,0.4089666666666672,22.808666666666667,-5.837633333333333,2.413266666666668,7.457766666666667],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[-4.875833333333333,0.4089666666666672,22.808666666666667,-5.837633333333333,2.413266666666668,7.457766666666667],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[20.659911026101412,17.144594771825936,18.155967785552708,13.603164341731267,11.844229521553478,18.592132553235203],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[20.659911026101412,17.144594771825936,18.155967785552708,13.603164341731267,11.844229521553478,18.592132553235203],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0055 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 1"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[3.4575,8.7423,8.766799999999975,2.4956999999999994,10.746599999999997,15.7911],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[3.4575,8.7423,8.766799999999975,2.4956999999999994,10.746599999999997,15.7911],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[0.0,0.0,22.375200000000024,6.938893903907228e-16,4.163336342344337e-15,0.0],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[0.0,0.0,22.375200000000024,6.938893903907228e-16,4.163336342344337e-15,0.0],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[6.614566164709222,17.926760586332836,20.374344870089125,3.5696229305556852,15.627062708869213,35.88764273944391],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[6.614566164709222,17.926760586332836,20.374344870089125,3.5696229305556852,15.627062708869213,35.88764273944391],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0658 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 2"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[3.4574999999999245,8.7423,10.87925883514474,2.495699999999996,10.746599999999999,13.678641164855318],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[3.4574999999999245,8.7423,10.87925883514474,2.495699999999996,10.746599999999999,13.678641164855318],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[7.563394355258879e-14,0.0,20.262741164855257,4.163336342344337e-15,1.3877787807814457e-15,2.1124588351446816],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[7.563394355258879e-14,0.0,20.262741164855257,4.163336342344337e-15,1.3877787807814457e-15,2.1124588351446816],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[6.3902297545656666,17.845922149342965,26.009923131021743,3.522018108801229,15.618381734645512,30.613525121622885],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[6.3902297545656666,17.845922149342965,26.009923131021743,3.522018108801229,15.618381734645512,30.613525121622885],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0563 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 3"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[3.4574999999999947,8.7423,11.463226198043845,2.4957,10.746599999999999,13.094673801956134],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[3.4574999999999947,8.7423,11.463226198043845,2.4957,10.746599999999999,13.094673801956134],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[5.551115123125783e-15,0.0,19.67877380195615,0.0,1.3877787807814457e-15,2.6964261980438664],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[5.551115123125783e-15,0.0,19.67877380195615,0.0,1.3877787807814457e-15,2.6964261980438664],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[6.3237730278147195,17.810230509712614,27.595544924285427,3.506279200839847,15.60419586117853,29.15997647616888],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[6.3237730278147195,17.810230509712614,27.595544924285427,3.506279200839847,15.60419586117853,29.15997647616888],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0558 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 4"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[3.4574999999999947,8.7423,11.463226198043845,2.4957,10.746599999999999,13.094673801956134],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[3.4574999999999947,8.7423,11.463226198043845,2.4957,10.746599999999999,13.094673801956134],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[5.551115123125783e-15,0.0,19.67877380195615,0.0,1.3877787807814457e-15,2.6964261980438664],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[5.551115123125783e-15,0.0,19.67877380195615,0.0,1.3877787807814457e-15,2.6964261980438664],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[6.3237730278147195,17.810230509712614,27.595544924285427,3.506279200839847,15.60419586117853,29.15997647616888],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[6.3237730278147195,17.810230509712614,27.595544924285427,3.506279200839847,15.60419586117853,29.15997647616888],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0558 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 5"}]);
+                        }).then(function(){
+                            Plotly.animate('eb69664f-11d3-4426-9b5a-5a7b50867ed4', null);
+                        })                };                            </script>        </div>
+        <p>The following shows the same optimization <strong>allowing short positions</strong>:</p>
+        <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>                <div id="8dea8fb2-dfc6-4e53-9283-cb0a95ec4e68" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("8dea8fb2-dfc6-4e53-9283-cb0a95ec4e68")) {                    Plotly.newPlot(                        "8dea8fb2-dfc6-4e53-9283-cb0a95ec4e68",                        [{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[-4.875833333333333,0.4089666666666672,22.808666666666667,-5.837633333333333,2.413266666666668,7.457766666666667],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[-4.875833333333333,0.4089666666666672,22.808666666666667,-5.837633333333333,2.413266666666668,7.457766666666667],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[20.659911026101412,17.144594771825936,18.155967785552708,13.603164341731267,11.844229521553478,18.592132553235203],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[20.659911026101412,17.144594771825936,18.155967785552708,13.603164341731267,11.844229521553478,18.592132553235203],"type":"bar"}],                        {"barmode":"group","sliders":[{"steps":[{"args":[["Iteration 1"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 1","method":"animate"},{"args":[["Iteration 2"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 2","method":"animate"},{"args":[["Iteration 3"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 3","method":"animate"},{"args":[["Iteration 4"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 4","method":"animate"},{"args":[["Iteration 5"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 5","method":"animate"},{"args":[["Iteration 6"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 6","method":"animate"},{"args":[["Iteration 7"],{"frame":{"duration":0,"redraw":true}}],"label":"Iteration 7","method":"animate"}]}],"title":{"text":"Optimization Process: Active Weights and Ex Ante Risk Contribution Allowing for Shorts"},"yaxis":{"range":[-50,50]},"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
+                            Plotly.addFrames('8dea8fb2-dfc6-4e53-9283-cb0a95ec4e68', [{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332,8.333333333333332],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[-4.875833333333333,0.4089666666666672,22.808666666666667,-5.837633333333333,2.413266666666668,7.457766666666667],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[-4.875833333333333,0.4089666666666672,22.808666666666667,-5.837633333333333,2.413266666666668,7.457766666666667],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[20.659911026101412,17.144594771825936,18.155967785552708,13.603164341731267,11.844229521553478,18.592132553235203],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[20.659911026101412,17.144594771825936,18.155967785552708,13.603164341731267,11.844229521553478,18.592132553235203],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0055 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 1"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[0.0,5.016849652747613,1.7939866142114569,20.075349343824207,23.113814389216724,1.3877787807814457e-15],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[0.0,5.016849652747613,1.7939866142114569,20.075349343824207,23.113814389216724,1.3877787807814457e-15],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[3.4575,3.7254503472523868,29.34801338578854,-17.579649343824205,-12.367214389216723,15.791099999999997],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[3.4575,3.7254503472523868,29.34801338578854,-17.579649343824205,-12.367214389216723,15.791099999999997],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[0.0,8.78416507913103,3.425997956860459,45.307695757776614,42.48214120623189,2.648319602653455e-15],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[0.0,8.78416507913103,3.425997956860459,45.307695757776614,42.48214120623189,2.648319602653455e-15],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.1946 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 2"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[3.5511556322345474,9.121181974528499,9.225388667184111,5.713318989954576,12.827826231675813,9.561128504422454],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[3.5511556322345474,9.121181974528499,9.225388667184111,5.713318989954576,12.827826231675813,9.561128504422454],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[-0.09365563223454748,-0.37888197452849853,21.91661133281589,-3.2176189899545764,-2.081226231675812,6.229971495577545],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[-0.09365563223454748,-0.37888197452849853,21.91661133281589,-3.2176189899545764,-2.081226231675812,6.229971495577545],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[6.8586569304436,19.24538929037137,22.39796629733377,9.283604490755609,20.29506782143461,21.919315169661044],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[6.8586569304436,19.24538929037137,22.39796629733377,9.283604490755609,20.29506782143461,21.919315169661044],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0231 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 3"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[7.568328874748804,7.904279449998647,6.211138224297823,7.913129250315832,13.184478216162274,7.218645984476615],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[7.568328874748804,7.904279449998647,6.211138224297823,7.913129250315832,13.184478216162274,7.218645984476615],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[-4.110828874748805,0.8380205500013532,24.930861775702173,-5.4174292503158314,-2.437878216162273,8.572454015523384],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[-4.110828874748805,0.8380205500013532,24.930861775702173,-5.4174292503158314,-2.437878216162273,8.572454015523384],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[18.770739633387798,16.603658287123952,13.681529529783715,13.775770645511507,20.63163815711258,16.53666374708044],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[18.770739633387798,16.603658287123952,13.681529529783715,13.775770645511507,20.63163815711258,16.53666374708044],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0037 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 4"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[7.051389842689286,7.8241226067915575,7.676944470259846,9.392284667767008,10.971413159394091,7.0838452530982154],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[7.051389842689286,7.8241226067915575,7.676944470259846,9.392284667767008,10.971413159394091,7.0838452530982154],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[-3.593889842689286,0.9181773932084427,23.46505552974015,-6.896584667767009,-0.22481315939409108,8.707254746901784],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[-3.593889842689286,0.9181773932084427,23.46505552974015,-6.896584667767009,-0.22481315939409108,8.707254746901784],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[16.842221618943586,16.403971612614917,17.253158953910766,16.512055798963384,16.87915996232531,16.109432053242035],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[16.842221618943586,16.403971612614917,17.253158953910766,16.512055798963384,16.87915996232531,16.109432053242035],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0001 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 5"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[7.056174451740281,7.89306918053882,7.341230732928775,9.62242164460255,10.761500048202516,7.3256039419870564],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[7.056174451740281,7.89306918053882,7.341230732928775,9.62242164460255,10.761500048202516,7.3256039419870564],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[-3.598674451740281,0.8492308194611803,23.800769267071225,-7.126721644602552,-0.014900048202515226,8.465496058012944],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[-3.598674451740281,0.8492308194611803,23.800769267071225,-7.126721644602552,-0.014900048202515226,8.465496058012944],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[16.92670582209714,16.538030086085083,16.368421799622983,16.989919059345343,16.507995233933713,16.668927998915727],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[16.92670582209714,16.538030086085083,16.368421799622983,16.989919059345343,16.507995233933713,16.668927998915727],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0000 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 6"},{"data":[{"marker":{"color":"orange"},"name":"Active Weight (%)","text":[6.979992862860248,8.077639632302727,7.422406376492914,9.459754363029012,10.816959217366373,7.243247547948728],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[6.979992862860248,8.077639632302727,7.422406376492914,9.459754363029012,10.816959217366373,7.243247547948728],"type":"bar"},{"marker":{"color":"green"},"name":"Absolute Weight (%)","text":[-3.5224928628602483,0.6646603676972729,23.719593623507084,-6.964054363029012,-0.07035921736637252,8.547852452051272],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[-3.5224928628602483,0.6646603676972729,23.719593623507084,-6.964054363029012,-0.07035921736637252,8.547852452051272],"type":"bar"},{"marker":{"color":"blue"},"name":"Ex Ante Risk Contribution (%)","text":[16.676790195611645,16.950111065599636,16.61678672707311,16.655554653579387,16.610460390817888,16.490296967318322],"textposition":"outside","texttemplate":"%{text:.2f}%","x":["Energy","Industrials","Information Technology","Utilities","Health Care","Financials"],"y":[16.676790195611645,16.950111065599636,16.61678672707311,16.655554653579387,16.610460390817888,16.490296967318322],"type":"bar"}],"layout":{"annotations":[{"font":{"size":14},"showarrow":false,"text":"Sum of Squared Differences: 0.0000 | Active Share: 0.5000","x":0.5,"xref":"paper","y":-0.2,"yref":"paper"}]},"name":"Iteration 7"}]);
+                        }).then(function(){
+                            Plotly.animate('8dea8fb2-dfc6-4e53-9283-cb0a95ec4e68', null);
+                        })                };                            </script>        </div>
+    </div>
+
+    <div class="content">
+        <h2>Numerical Example of Gradient Calculation and Step Size</h2>
+        <p>
+            To illustrate how the gradient is calculated and the step size is determined in the SLSQP algorithm, we use the following:
+        </p>
+        <ul>
+            <li><strong>Covariance Matrix (\( \Sigma \))</strong> (as calculated over last 3 years):</li>
+        </ul>
+        <div class="equation">
+        \[
+        \Sigma = 
+        \begin{bmatrix}
+        0.089618 & 0.025347 & 0.011072 & 0.015178 & 0.008784 & 0.028007 \\
+        0.025347 & 0.030405 & 0.029316 & 0.017300 & 0.015910 & 0.029440 \\
+        0.011072 & 0.029316 & 0.051999 & 0.015003 & 0.019991 & 0.029051 \\
+        0.015178 & 0.017300 & 0.015003 & 0.033967 & 0.016893 & 0.018864 \\
+        0.008784 & 0.015910 & 0.019991 & 0.016893 & 0.022112 & 0.018360 \\
+        0.028007 & 0.029440 & 0.029051 & 0.018864 & 0.018360 & 0.036468
+        \end{bmatrix}
+        \]
+        </div>
+        <p>The <strong>initial guess weights (\( w^0 \))</strong> are equally allocated across sectors:</p>
+        <div class="equation">
+            \[
+            w^0 = \begin{bmatrix} 0.0833 & 0.0833 & 0.0833 & 0.0833 & 0.0833 & 0.0833 \end{bmatrix}
+            \]
+        </div>
+
+        <h3>Step 1: Multiply \( \Sigma \) by the Initial Weights \( w^0 \)</h3>
+        <p>We calculate \( \Sigma w^0 \) as follows:</p>
+        <div class="equation">
+            \[
+            (\Sigma w^0)_i = \sum_{j=1}^6 \Sigma_{i,j} \cdot w_j
+            \]
+        </div>
+        <p>Substituting values for the first row:</p>
+        <div class="equation">
+            \[
+            (\Sigma w^0)_1 = (0.089618 \cdot 0.0833) + (0.025347 \cdot 0.0833) + \dots = 0.015
+            \]
+        </div>
+        <p>This calculation is repeated for all rows, resulting in the vector:</p>
+        <div class="equation">
+            \[
+            \Sigma w^0 = \begin{bmatrix} 0.0148 & 0.0123 & 0.0130 & 0.0098 & 0.0085 & 0.0133 \end{bmatrix}
+            \]
+        </div>
+
+        <h3>Step 2: Calculate the Ex Ante Active Risk</h3>
+        <p>The total Ex Ante Active Risk (used interchangeably with Ex Ante Tracking Error) is calculated as:</p>
+        <div class="equation">
+            \[
+            \text{Ex Ante Active Risk (or Tracking Error)} = \sqrt{w^T \Sigma w}
+            \]
+        </div>
+        <p>Substituting the values:</p>
+        <div class="equation">
+            \[
+            w^T \Sigma w = (0.0833 \cdot 0.015) + (0.0833 \cdot 0.012) + \dots = 0.00598
+            \]
+            \[
+            \text{Ex Ante Active Risk} = \sqrt{0.00598} = 0.0773
+            \]
+        </div>
+
+        <h3>Step 3: Divide \( \Sigma w \) by the Ex Ante Active Risk</h3>
+        <p>The gradient \( \nabla f(w) \) is calculated as:</p>
+        <div class="equation">
+            \[
+            \nabla f(w) = \frac{\Sigma w}{\text{Ex Ante Active Risk}}
+            \]
+        </div>
+        <p>Substituting the values:</p>
+        <div class="equation">
+            \[
+            \nabla f(w) = \begin{bmatrix}
+            \frac{0.015}{0.077} & \frac{0.012}{0.077} & \frac{0.013}{0.077} & \frac{0.0098}{0.077} & \frac{0.0085}{0.077} & \frac{0.0085}{0.077}
+            \end{bmatrix}
+            \]
+            \[
+            \nabla f(w) = \begin{bmatrix} 0.191 & 0.159 & 0.168 & 0.126 & 0.110 & 0.173 \end{bmatrix}
+            \]
+        </div>
+
+        <h3>Step 4: Step Size and Direction</h3>
+        <p>
+            The step size \( \alpha \) is determined using a line search method, which minimizes the objective function along the calculated gradient direction. \( \alpha \) represents the 'magnitude' of the step and is calculated iteratively such that constraints are not violated. The algorithm assumes a large \( \alpha \) initially and incrementally decreases its value by very small steps until no constraints are violated.
+            If the maximum size \( \alpha \)  can be is very small the optimization process terminates.
+        </p>
+        <p>The updated weights are computed as:</p>
+        <div class="equation">
+            \[
+            w^{t+1} = w^t - \alpha \nabla f(w)
+            \]
+        </div>
+        <p>For example, in the first iteration of the 'with shorts' optimization \( \alpha = 0.4345 \), the updated weights would be:</p>
+        <div class="equation">
+            \[
+            w^{t+1} = \begin{bmatrix} 0.0833 & 0.0833 & \dots \end{bmatrix} - 0.4345 \cdot \begin{bmatrix} 0.191 & 0.159 & \dots \end{bmatrix}
+            \]
+        </div>
+        <p>The weights are subsequently bound to zero and scaled to sum to 0.5, which results in weights for the first iteration being:</p>
+        <div class="equation">
+            \[
+            w^{t+1} = \begin{bmatrix} 0 & 0.0502 & 0.0179 & 0.2008 & 0.2311 & 0 \end{bmatrix}
+            \]
+        </div>
+    </div>
+</html>
