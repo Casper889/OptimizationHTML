@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Derivation for Variance in Risk Contributions</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .math {
+            font-style: italic;
+            color: #34495e;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gradient Derivation for Variance in Risk Contributions (VRC)</h1>
+
+    <h2>Step 1: Understand What We Are Differentiating</h2>
+    <p>The <em>Variance in Risk Contributions (VRC)</em> is defined as:</p>
+    <p>
+        \[
+        \text{VRC} = \frac{1}{N} \sum_{i=1}^N (RC_i - \bar{RC})^2
+        \]
+    </p>
+    <p>where:</p>
+    <ul>
+        <li>\( RC_i = w_i \cdot \frac{(w^\top \Sigma)_i}{\sigma_p} \), the <strong>risk contribution</strong> of asset \( i \).</li>
+        <li>\( \bar{RC} = \frac{1}{N} \sum_{i=1}^N RC_i \), the <strong>mean risk contribution</strong>.</li>
+        <li>\( \sigma_p = \sqrt{w^\top \Sigma w} \), the portfolio standard deviation.</li>
+    </ul>
+    <p>The goal is to compute \( \frac{\partial \text{VRC}}{\partial w_j} \), which tells us how changing a single weight \( w_j \) affects the VRC.</p>
+
+    <h2>Step 2: Expand the VRC Formula</h2>
+    <p>The VRC measures how far each \( RC_i \) is from the mean. To differentiate:</p>
+    <ul>
+        <li>Differentiate the squared term \( (RC_i - \bar{RC})^2 \).</li>
+        <li>Then differentiate each component: \( RC_i \) and \( \bar{RC} \).</li>
+    </ul>
+
+    <h2>Step 3: Differentiate \( (RC_i - \bar{RC})^2 \)</h2>
+    <p>Using the chain rule:</p>
+    <p>
+        \[
+        \frac{\partial (RC_i - \bar{RC})^2}{\partial w_j} = 2 \cdot (RC_i - \bar{RC}) \cdot \frac{\partial (RC_i - \bar{RC})}{\partial w_j}
+        \]
+    </p>
+    <p>Now we need:</p>
+    <p>
+        \[
+        \frac{\partial (RC_i - \bar{RC})}{\partial w_j} = \frac{\partial RC_i}{\partial w_j} - \frac{\partial \bar{RC}}{\partial w_j}
+        \]
+    </p>
+
+    <h2>Step 4: Differentiate \( RC_i \)</h2>
+    <p>The formula for \( RC_i \) is:</p>
+    <p>
+        \[
+        RC_i = w_i \cdot \frac{(w^\top \Sigma)_i}{\sigma_p}
+        \]
+    </p>
+    <p>Using the product rule, this becomes:</p>
+    <p>
+        \[
+        \frac{\partial RC_i}{\partial w_j} = \delta_{ij} \cdot \frac{(w^\top \Sigma)_i}{\sigma_p} + w_i \cdot \frac{\partial}{\partial w_j} \left( \frac{(w^\top \Sigma)_i}{\sigma_p} \right)
+        \]
+    </p>
+
+    <h3>4.1: Derivative of \( w_i \)</h3>
+    <p>If \( i = j \), then:</p>
+    <p>
+        \[
+        \frac{\partial w_i}{\partial w_j} = 1
+        \]
+    </p>
+    <p>If \( i \neq j \), then:</p>
+    <p>
+        \[
+        \frac{\partial w_i}{\partial w_j} = 0
+        \]
+    </p>
+    <p>This is captured by the <strong>Kronecker delta</strong>:</p>
+    <p>
+        \[
+        \delta_{ij} = 
+        \begin{cases} 
+        1 & \text{if } i = j \\
+        0 & \text{if } i \neq j
+        \end{cases}
+        \]
+    </p>
+
+    <h3>4.2: Derivative of \( \frac{(w^\top \Sigma)_i}{\sigma_p} \)</h3>
+    <p>Using the quotient rule:</p>
+    <p>
+        \[
+        \frac{\partial}{\partial w_j} \left( \frac{(w^\top \Sigma)_i}{\sigma_p} \right) = \frac{\Sigma_{ji}}{\sigma_p} - \frac{(w^\top \Sigma)_i \cdot (w^\top \Sigma)_j}{\sigma_p^3}
+        \]
+    </p>
+
+    <h3>4.3: Combine Terms for \( RC_i \)</h3>
+    <p>The full derivative of \( RC_i \) is:</p>
+    <p>
+        \[
+        \frac{\partial RC_i}{\partial w_j} = \delta_{ij} \cdot \frac{(w^\top \Sigma)_i}{\sigma_p} + w_i \cdot \left( \frac{\Sigma_{ji}}{\sigma_p} - \frac{(w^\top \Sigma)_i \cdot (w^\top \Sigma)_j}{\sigma_p^3} \right)
+        \]
+    </p>
+
+    <h2>Pseudocode for Gradient Calculation</h2>
+    <pre><code>
+Input:
+  - weights (w): array of portfolio weights
+  - covariance_matrix (Σ): covariance matrix of asset returns
+  - num_assets (N): number of assets in the portfolio
+
+Step 1: Compute portfolio standard deviation:
+  σ_p = sqrt(wᵀ * Σ * w)
+
+Step 2: Compute marginal risk contributions:
+  mrc = (Σ * w) / σ_p
+
+Step 3: Compute risk contributions:
+  rc = w * mrc
+
+Step 4: Compute mean risk contribution:
+  rc_mean = mean(rc)
+
+Step 5: Initialize gradient vector:
+  gradient = zeros(N)
+
+Step 6: For each weight w[j]:
+  6.1 Initialize partial derivative of RC:
+       partial_rc = zeros(N)
+  6.2 For each asset i:
+         kronecker_delta = 1 if i == j else 0
+         term1 = kronecker_delta * mrc[i]
+         term2 = w[i] * (Σ[i, j] / σ_p - mrc[i] * mrc[j] / σ_p^3)
+         partial_rc[i] = term1 + term2
+  6.3 Compute mean partial derivative:
+       partial_rc_mean = mean(partial_rc)
+  6.4 Update gradient:
+       gradient[j] = (2 / N) * sum((rc - rc_mean) * (partial_rc - partial_rc_mean))
+
+Output:
+  - gradient: array of partial derivatives of VRC w.r.t. weights
+    </code></pre>
+
+    <h2>Summary</h2>
+    <p>The gradient helps redistribute weights to balance risk contributions across assets. If you need further clarification or implementation details, let me know!</p>
+</body>
+</html>
